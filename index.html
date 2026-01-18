@@ -405,7 +405,9 @@ function animate() {
                 if (Math.random() < 0.3) { op = 'mul'; val = 2; label = '×2'; }
                 else { op = 'add'; val = Math.floor(Math.random() * 20) + 5; label = '+' + val; }
             } else {
-                if (Math.random() < 0.3) { op = 'div'; val = 2; label = '÷2'; }
+                const r = Math.random();
+                if (r < 0.05) { op = 'div'; val = 0; label = '÷0'; }
+                else if (r < 0.3) { op = 'div'; val = 2; label = '÷2'; }
                 else { op = 'sub'; val = Math.floor(Math.random() * 20) + 5; label = '-' + val; }
             }
 
@@ -504,7 +506,13 @@ function animate() {
             if (data.op === 'add') power += data.val;
             if (data.op === 'sub') power -= data.val;
             if (data.op === 'mul') power *= data.val;
-            if (data.op === 'div') power = Math.floor(power / data.val);
+            if (data.op === 'div') {
+                if (data.val === 0) {
+                    gameOver();
+                    return;
+                }
+                power = Math.floor(power / data.val);
+            }
 
             if (power < 1) power = 1; 
             

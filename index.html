@@ -446,9 +446,30 @@ function animate() {
             enemy.userData = { 
                 type: 'enemy', 
                 hp: hp, 
+                maxHp: hp,
                 isBig: isBig,
                 speed: isBig ? 2 : 5 
             };
+
+            // HPバーの背景
+            const barWidth = size * 0.8;
+            const barHeight = 0.2;
+            const barBgGeo = new THREE.PlaneGeometry(barWidth, barHeight);
+            const barBgMat = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            const barBg = new THREE.Mesh(barBgGeo, barBgMat);
+            barBg.position.y = size / 2 + 0.5;
+            barBg.rotation.x = -Math.PI / 4;
+            enemy.add(barBg);
+
+            // HPバーの前面（残りHP）
+            const barFgGeo = new THREE.PlaneGeometry(barWidth, barHeight);
+            barFgGeo.translate(barWidth / 2, 0, 0); // 左端からスケールするように調整
+            const barFgMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const barFg = new THREE.Mesh(barFgGeo, barFgMat);
+            barFg.position.set(-barWidth / 2, size / 2 + 0.5, 0.01);
+            barFg.rotation.x = -Math.PI / 4;
+            enemy.add(barFg);
+            enemy.userData.hpBar = barFg;
             
             scene.add(enemy);
             enemies.push(enemy);
@@ -520,7 +541,12 @@ function animate() {
                         
                         e.userData.hp--;
                         
-                        
+                        // HPバー更新
+                        if (e.userData.hpBar) {
+                            const ratio = Math.max(0, e.userData.hp / e.userData.maxHp);
+                            e.userData.hpBar.scale.x = ratio;
+                        }
+
                         scene.remove(b);
                         bullets.splice(bIndex, 1);
 
